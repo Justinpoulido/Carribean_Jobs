@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let browserClient: SupabaseClient | null = null;
+let serverAdminClient: SupabaseClient | null = null;
 
 export function hasSupabaseConfig() {
   return Boolean(
@@ -22,4 +23,31 @@ export function getSupabaseBrowserClient() {
   }
 
   return browserClient;
+}
+
+export function hasSupabaseAdminConfig() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
+}
+
+export function getSupabaseAdminClient() {
+  if (!hasSupabaseAdminConfig()) {
+    return null;
+  }
+
+  if (!serverAdminClient) {
+    serverAdminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      },
+    );
+  }
+
+  return serverAdminClient;
 }
