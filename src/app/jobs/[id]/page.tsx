@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ApplicationModal } from "@/components/ApplicationModal";
 import { formatSalary, getJobById, sampleJobs } from "@/data/jobs";
+import { getPublishedJobById } from "@/lib/jobs";
 
 export async function generateStaticParams() {
   return sampleJobs.map((job) => ({ id: job.id }));
@@ -15,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const job = getJobById(id);
+  const job = (await getPublishedJobById(id)) || getJobById(id);
   if (!job) {
     return { title: "Job not found" };
   }
@@ -48,7 +49,7 @@ export default async function JobDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const job = getJobById(id);
+  const job = await getPublishedJobById(id);
   if (!job) {
     notFound();
   }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JobsExplorer } from "@/components/JobsExplorer";
-import { sampleJobs } from "@/data/jobs";
+import { getPublishedJobs } from "@/lib/jobs";
 
 export const metadata: Metadata = {
   title: "Browse Jobs",
@@ -22,6 +22,7 @@ export default async function JobsPage({
       Array.isArray(value) ? value[0] || "" : value || "",
     ]),
   );
+  const jobs = await getPublishedJobs();
 
   return (
     <>
@@ -42,7 +43,7 @@ export default async function JobsPage({
           </div>
         </section>
         <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <JobsExplorer jobs={sampleJobs} initialFilters={initialFilters} />
+          <JobsExplorer jobs={jobs} initialFilters={initialFilters} />
         </section>
       </main>
       <Footer />

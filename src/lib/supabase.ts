@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let browserClient: SupabaseClient | null = null;
 let serverAdminClient: SupabaseClient | null = null;
+let publicServerClient: SupabaseClient | null = null;
 
 export function hasSupabaseConfig() {
   return Boolean(
@@ -23,6 +24,27 @@ export function getSupabaseBrowserClient() {
   }
 
   return browserClient;
+}
+
+export function getSupabasePublicServerClient() {
+  if (!hasSupabaseConfig()) {
+    return null;
+  }
+
+  if (!publicServerClient) {
+    publicServerClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      },
+    );
+  }
+
+  return publicServerClient;
 }
 
 export function hasSupabaseAdminConfig() {

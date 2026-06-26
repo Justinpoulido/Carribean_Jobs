@@ -121,28 +121,22 @@ alter table public.jobs enable row level security;
 alter table public.applications enable row level security;
 alter table public.contacts enable row level security;
 
+drop policy if exists "Public can read published jobs" on public.jobs;
 create policy "Public can read published jobs"
   on public.jobs for select
   using (status = 'published');
 
+drop policy if exists "Public can submit jobs" on public.jobs;
 create policy "Public can submit jobs"
   on public.jobs for insert
   with check (status in ('published', 'draft'));
 
+drop policy if exists "Public can submit applications" on public.applications;
 create policy "Public can submit applications"
   on public.applications for insert
   with check (true);
 
+drop policy if exists "Public can submit contact messages" on public.contacts;
 create policy "Public can submit contact messages"
   on public.contacts for insert
   with check (true);
-
-create policy "Service role can manage job sources"
-  on public.job_sources for all
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
-
-create policy "Service role can manage import runs"
-  on public.job_import_runs for all
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
