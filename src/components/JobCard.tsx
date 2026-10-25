@@ -8,7 +8,7 @@ export function JobCard({ job }: { job: Job }) {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(job.created_at));
+  }).format(new Date(job.posted_at || job.created_at));
 
   return (
     <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -36,7 +36,7 @@ export function JobCard({ job }: { job: Job }) {
           href={`/jobs/${job.id}`}
           className="inline-flex items-center justify-center rounded-lg bg-[#0077b6] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#005f8f]"
         >
-          Apply
+          View job
         </Link>
       </div>
       <div className="mt-5 grid gap-3 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4">

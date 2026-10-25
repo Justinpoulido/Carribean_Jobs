@@ -1,3 +1,5 @@
+export type SalaryPeriod = "Hour" | "Month" | "Year";
+
 export type Job = {
   id: string;
   title: string;
@@ -8,15 +10,18 @@ export type Job = {
   category: string;
   job_type: string;
   work_mode: "Remote" | "On-site" | "Hybrid";
-  salary_min: number;
-  salary_max: number;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_currency?: string | null;
+  salary_period?: SalaryPeriod | null;
   description: string;
   requirements: string[];
   responsibilities: string[];
   benefits: string[];
-  application_email?: string;
-  application_link?: string;
+  application_email?: string | null;
+  application_link?: string | null;
   is_featured: boolean;
+  featured_requested?: boolean;
   status: "published" | "draft" | "closed";
   created_at: string;
   source_id?: number | null;

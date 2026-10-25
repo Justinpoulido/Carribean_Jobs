@@ -3,19 +3,10 @@
 import { useActionState } from "react";
 import { addJobSource } from "./actions";
 import { SubmitButton } from "@/components/FormStatus";
-import { countries } from "@/data/jobs";
+import { categories, countries } from "@/data/jobs";
 
 const sourceTypes = ["api", "ats", "rss", "scraper", "manual"];
-const sectors = [
-  "",
-  "Finance",
-  "IT",
-  "Energy",
-  "Education",
-  "Healthcare",
-  "Management",
-  "Sales",
-];
+const sectors = ["", ...categories];
 
 export function AddSourceForm() {
   const [state, formAction] = useActionState(addJobSource, {
@@ -35,7 +26,6 @@ export function AddSourceForm() {
           pages.
         </p>
       </div>
-      <input name="admin_secret" type="password" placeholder="Admin secret" className="field" />
       <input required name="name" placeholder="Source name" className="field" />
       <select required name="source_type" defaultValue="" className="field">
         <option value="" disabled>

@@ -1,6 +1,8 @@
 import type { ImportedJob, JobSource } from "@/lib/types";
 import { getSupabaseAdminClient } from "@/lib/supabase";
-import { categorizeSector, sectorToCategory } from "./categorize";
+import { categories, currencyForCountry } from "@/data/jobs";
+import { DEFAULT_LISTING_DAYS } from "@/lib/site";
+import { categorize } from "./categorize";
 import { createDuplicateHash } from "./hash";
 import { getConnector } from "./connectors";
 
@@ -14,7 +16,7 @@ type ImportSummary = {
 };
 
 function normalizeJob(source: JobSource, job: ImportedJob) {
-  const sector = categorizeSector({
+  const category = categorize({
     title: job.title,
     description: job.description,
     sector: job.sector || source.sector,
@@ -34,18 +36,22 @@ function normalizeJob(source: JobSource, job: ImportedJob) {
     contact_email: "",
     country,
     city,
-    category: job.category || sectorToCategory(sector),
+    category:
+      job.category && categories.includes(job.category) ? job.category : category,
     job_type: job.job_type || "Full-time",
     work_mode: job.work_mode || "On-site",
     salary_min: job.salary_min || null,
     salary_max: job.salary_max || null,
+    salary_currency:
+      job.salary_min || job.salary_max ? currencyForCountry(country) : null,
+    salary_period: job.salary_min || job.salary_max ? "Year" : null,
     description:
       job.description ||
       "Imported job listing. Review the original source URL before publishing.",
     requirements: job.requirements || "",
     responsibilities: job.responsibilities || "",
     benefits: job.benefits || "",
-    application_email: "",
+    application_email: null,
     application_link: job.apply_url || job.source_url,
     is_featured: false,
     status: source.trusted_auto_publish ? "published" : "draft",
@@ -54,11 +60,16 @@ function normalizeJob(source: JobSource, job: ImportedJob) {
     source_url: job.source_url,
     external_id: job.external_id,
     apply_url: job.apply_url || job.source_url,
-    sector,
+    sector: category,
     import_status: source.trusted_auto_publish ? "published" : "pending",
     duplicate_hash,
     posted_at: job.posted_at || null,
-    expires_at: job.expires_at || null,
+    // Imported jobs without a closing date expire after the default window.
+    expires_at:
+      job.expires_at ||
+      new Date(
+        Date.now() + DEFAULT_LISTING_DAYS * 24 * 60 * 60 * 1000,
+      ).toISOString(),
   };
 }
 

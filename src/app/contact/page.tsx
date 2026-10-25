@@ -31,7 +31,13 @@ export default function ContactPage() {
           <ContactStatus action={submitContact}>
             <input required name="name" placeholder="Name" className="field" />
             <input required name="email" type="email" placeholder="Email" className="field" />
-            <textarea required name="message" rows={6} placeholder="Message" className="field" />
+            <textarea required name="message" rows={6} maxLength={4000} placeholder="Message" className="field" />
+            <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+              <label>
+                Company website
+                <input name="company_website" tabIndex={-1} autoComplete="off" />
+              </label>
+            </div>
             <SubmitButton
               pendingText="Sending..."
               className="rounded-lg bg-[#0077b6] px-5 py-3 font-bold text-white transition hover:bg-[#005f8f] disabled:opacity-70"

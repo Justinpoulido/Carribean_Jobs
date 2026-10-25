@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Globe2, Mail, Share2, Users } from "lucide-react";
+import { Mail } from "lucide-react";
 import { countries } from "@/data/jobs";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 const quickLinks = [
   ["Jobs", "/jobs"],
@@ -20,11 +21,11 @@ export function Footer() {
             Your Future. Our Caribbean. One Opportunity at a Time.
           </p>
           <a
-            href="mailto:hello@caribbeanjobs.com"
+            href={`mailto:${CONTACT_EMAIL}`}
             className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#fbbf24]"
           >
             <Mail size={16} aria-hidden="true" />
-            hello@caribbeanjobs.com
+            {CONTACT_EMAIL}
           </a>
         </div>
         <div>
@@ -43,7 +44,14 @@ export function Footer() {
           <h3 className="font-semibold">Countries</h3>
           <ul className="mt-4 grid grid-cols-2 gap-3 text-sm text-blue-100">
             {countries.slice(0, 8).map((country) => (
-              <li key={country}>{country}</li>
+              <li key={country}>
+                <Link
+                  href={`/jobs?country=${encodeURIComponent(country)}`}
+                  className="hover:text-white"
+                >
+                  {country}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
@@ -53,17 +61,12 @@ export function Footer() {
             Promote vacancies, reach active candidates, and receive applications
             from across the region.
           </p>
-          <div className="mt-5 flex gap-3 text-blue-100">
-            <a href="#" aria-label="Social profile" className="hover:text-white">
-              <Share2 size={20} />
-            </a>
-            <a href="#" aria-label="Community" className="hover:text-white">
-              <Users size={20} />
-            </a>
-            <a href="#" aria-label="Website" className="hover:text-white">
-              <Globe2 size={20} />
-            </a>
-          </div>
+          <Link
+            href="/post-job"
+            className="mt-5 inline-flex rounded-lg bg-[#f59e0b] px-4 py-2 text-sm font-bold text-slate-950"
+          >
+            Post a job
+          </Link>
         </div>
       </div>
       <div className="border-t border-white/10 px-4 py-5 text-center text-xs text-blue-100">
