@@ -29,8 +29,8 @@ Jobs stay live for 30 days after publishing (extendable in admin). The daily cro
 
 ## Database
 
-- Fresh setup: run `supabase/schema.sql` in the Supabase SQL Editor.
-- Existing database: run each file in `supabase/migrations/` in date order, **before** deploying the code that needs it.
+- New project: run `supabase/schema.sql` once in Supabase → SQL Editor (safe to re-run).
+- Future schema changes go in `supabase/migrations/` (dated files), applied in order **before** deploying the code that needs them; `schema.sql` is kept up to date as the full current schema.
 
 ## Development
 
