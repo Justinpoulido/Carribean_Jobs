@@ -1,6 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { isAdminAuthorization } from "@/lib/admin-auth";
+import { DEFAULT_LISTING_DAYS } from "@/lib/site";
 import { getSupabaseAdminClient } from "@/lib/supabase";
 
 type AdminState = {
@@ -8,22 +11,29 @@ type AdminState = {
   message: string;
 };
 
-function requireAdmin(formData: FormData) {
-  const configuredSecret = process.env.ADMIN_SECRET;
+// Server actions can be invoked from any route, so every action re-checks the
+// admin credentials itself instead of relying only on the /admin proxy.
+async function requireAdmin() {
+  const headerList = await headers();
+  return isAdminAuthorization(headerList.get("authorization"));
+}
 
-  if (!configuredSecret) {
-    return true;
+function refreshPublicPages(jobId?: FormDataEntryValue | null) {
+  revalidatePath("/admin/imports");
+  revalidatePath("/jobs");
+  revalidatePath("/");
+  revalidatePath("/sitemap.xml");
+  if (jobId) {
+    revalidatePath(`/jobs/${jobId}`);
   }
-
-  return formData.get("admin_secret") === configuredSecret;
 }
 
 export async function addJobSource(
   _previousState: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  if (!requireAdmin(formData)) {
-    return { ok: false, message: "Invalid admin secret." };
+  if (!(await requireAdmin())) {
+    return { ok: false, message: "Not authorized." };
   }
 
   const supabase = getSupabaseAdminClient();
@@ -50,7 +60,7 @@ export async function addJobSource(
 }
 
 export async function updateSourceStatus(formData: FormData) {
-  if (!requireAdmin(formData)) {
+  if (!(await requireAdmin())) {
     return;
   }
 
@@ -82,8 +92,17 @@ export async function updateSourceStatus(formData: FormData) {
   revalidatePath("/admin/imports");
 }
 
-export async function updateImportedJobStatus(formData: FormData) {
-  if (!requireAdmin(formData)) {
+type ModerationAction =
+  | "publish"
+  | "reject"
+  | "close"
+  | "feature"
+  | "unfeature"
+  | "extend";
+
+// One entry point for every moderation button on the admin page.
+export async function moderateJob(formData: FormData) {
+  if (!(await requireAdmin())) {
     return;
   }
 
@@ -92,17 +111,48 @@ export async function updateImportedJobStatus(formData: FormData) {
     return;
   }
 
-  const importStatus = String(formData.get("import_status"));
-  const jobStatus = importStatus === "published" ? "published" : "draft";
+  const jobId = formData.get("job_id");
+  const action = String(formData.get("action")) as ModerationAction;
+  const freshExpiry = new Date(
+    Date.now() + DEFAULT_LISTING_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString();
 
-  await supabase
-    .from("jobs")
-    .update({
-      import_status: importStatus,
-      status: jobStatus,
-    })
-    .eq("id", formData.get("job_id"));
+  const updates: Record<string, Record<string, unknown>> = {
+    publish: {
+      status: "published",
+      import_status: "published",
+      posted_at: new Date().toISOString(),
+      expires_at: freshExpiry,
+    },
+    reject: { status: "draft", import_status: "rejected", is_featured: false },
+    close: { status: "closed", is_featured: false },
+    feature: { is_featured: true, featured_requested: false },
+    unfeature: { is_featured: false },
+    extend: { expires_at: freshExpiry },
+  };
 
-  revalidatePath("/admin/imports");
-  revalidatePath("/jobs");
+  const update = updates[action];
+  if (!update || !jobId) {
+    return;
+  }
+
+  // Imported jobs keep their original posted_at / expiry when published.
+  if (action === "publish") {
+    const { data } = await supabase
+      .from("jobs")
+      .select("posted_at,expires_at,source_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (data?.source_id) {
+      update.posted_at = data.posted_at || update.posted_at;
+      update.expires_at =
+        data.expires_at && new Date(data.expires_at) > new Date()
+          ? data.expires_at
+          : freshExpiry;
+    }
+  }
+
+  await supabase.from("jobs").update(update).eq("id", jobId);
+  refreshPublicPages(jobId);
 }

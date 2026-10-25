@@ -40,6 +40,8 @@ create table if not exists public.jobs (
   work_mode text not null,
   salary_min numeric(12, 2),
   salary_max numeric(12, 2),
+  salary_currency text,
+  salary_period text,
   description text not null,
   requirements text,
   responsibilities text,
@@ -47,18 +49,22 @@ create table if not exists public.jobs (
   application_email text,
   application_link text,
   is_featured boolean not null default false,
-  status text not null default 'published',
+  featured_requested boolean not null default false,
+  status text not null default 'draft',
   source_id bigint references public.job_sources(id) on delete set null,
   source_name text,
   source_url text,
   external_id text,
   apply_url text,
   sector text,
-  import_status text not null default 'approved',
+  import_status text not null default 'pending',
   duplicate_hash text,
   posted_at timestamptz,
   expires_at timestamptz,
   created_at timestamptz not null default now(),
+  constraint jobs_salary_period_check check (
+    salary_period is null or salary_period in ('Hour', 'Month', 'Year')
+  ),
   constraint jobs_status_check check (status in ('published', 'draft', 'closed')),
   constraint jobs_work_mode_check check (work_mode in ('Remote', 'On-site', 'Hybrid')),
   constraint jobs_import_status_check check (
@@ -76,7 +82,10 @@ alter table public.jobs
   add column if not exists import_status text not null default 'approved',
   add column if not exists duplicate_hash text,
   add column if not exists posted_at timestamptz,
-  add column if not exists expires_at timestamptz;
+  add column if not exists expires_at timestamptz,
+  add column if not exists salary_currency text,
+  add column if not exists salary_period text,
+  add column if not exists featured_requested boolean not null default false;
 
 create table if not exists public.applications (
   id bigint generated always as identity primary key,
@@ -114,6 +123,9 @@ create index if not exists job_sources_active_idx on public.job_sources (is_acti
 create index if not exists job_import_runs_source_id_started_at_idx
   on public.job_import_runs (source_id, started_at desc);
 create index if not exists applications_job_id_idx on public.applications (job_id);
+create index if not exists jobs_expires_at_idx on public.jobs (expires_at);
+create index if not exists jobs_featured_requested_idx
+  on public.jobs (featured_requested) where featured_requested = true;
 
 alter table public.job_sources enable row level security;
 alter table public.job_import_runs enable row level security;
@@ -121,22 +133,13 @@ alter table public.jobs enable row level security;
 alter table public.applications enable row level security;
 alter table public.contacts enable row level security;
 
+-- All writes go through the server with the service-role key; the public
+-- (anon) role can only read live jobs.
 drop policy if exists "Public can read published jobs" on public.jobs;
 create policy "Public can read published jobs"
   on public.jobs for select
-  using (status = 'published');
+  using (status = 'published' and (expires_at is null or expires_at > now()));
 
 drop policy if exists "Public can submit jobs" on public.jobs;
-create policy "Public can submit jobs"
-  on public.jobs for insert
-  with check (status in ('published', 'draft'));
-
 drop policy if exists "Public can submit applications" on public.applications;
-create policy "Public can submit applications"
-  on public.applications for insert
-  with check (true);
-
 drop policy if exists "Public can submit contact messages" on public.contacts;
-create policy "Public can submit contact messages"
-  on public.contacts for insert
-  with check (true);

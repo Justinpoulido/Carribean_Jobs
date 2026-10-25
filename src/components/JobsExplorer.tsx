@@ -2,7 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { JobCard } from "./JobCard";
-import { categories, countries, jobTypes, workModes } from "@/data/jobs";
+import {
+  categories,
+  countries,
+  currencyForCountry,
+  jobTypes,
+  workModes,
+} from "@/data/jobs";
 import type { Job } from "@/lib/types";
 
 export function JobsExplorer({
@@ -32,8 +38,12 @@ export function JobsExplorer({
           .join(" ")
           .toLowerCase()
           .includes(keyword);
+      // Salaries are in different currencies, so the salary filter only
+      // applies once a country is chosen.
       const matchesSalary =
-        !filters.salary || job.salary_max >= Number(filters.salary);
+        !filters.salary ||
+        !filters.country ||
+        (job.salary_max ?? job.salary_min ?? 0) >= Number(filters.salary);
 
       return (
         matchesKeyword &&
@@ -108,14 +118,16 @@ export function JobsExplorer({
               </option>
             ))}
           </select>
-          <input
-            value={filters.salary}
-            onChange={(event) => updateFilter("salary", event.target.value)}
-            type="number"
-            min="0"
-            placeholder="Minimum salary"
-            className="rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0077b6]"
-          />
+          {filters.country ? (
+            <input
+              value={filters.salary}
+              onChange={(event) => updateFilter("salary", event.target.value)}
+              type="number"
+              min="0"
+              placeholder={`Minimum salary (${currencyForCountry(filters.country)})`}
+              className="rounded-lg border border-slate-200 px-4 py-3 outline-none focus:border-[#0077b6]"
+            />
+          ) : null}
           <select
             value={filters.work_mode}
             onChange={(event) => updateFilter("work_mode", event.target.value)}
@@ -141,7 +153,6 @@ export function JobsExplorer({
               Jobs across the Caribbean
             </h1>
           </div>
-          <p className="text-sm text-slate-500">Updated with sample listings</p>
         </div>
         <div className="grid gap-4">
           {visibleJobs.map((job) => (
