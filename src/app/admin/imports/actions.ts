@@ -93,7 +93,14 @@ export async function updateImportedJobStatus(formData: FormData) {
   }
 
   const importStatus = String(formData.get("import_status"));
-  const jobStatus = importStatus === "published" ? "published" : "draft";
+  // jobs.status only allows pending, approved, closed and rejected.
+  // The public board shows status = 'approved'.
+  const jobStatus =
+    importStatus === "approved" || importStatus === "published"
+      ? "approved"
+      : importStatus === "rejected"
+        ? "rejected"
+        : "pending";
 
   await supabase
     .from("jobs")

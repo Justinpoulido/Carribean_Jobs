@@ -53,7 +53,7 @@ Important columns:
 | `poster_name`, `contact_email` | The person who submitted the form. Not shown publicly |
 | `expires_at` | Closing date |
 | `is_featured` | Homepage highlight after approval. The fee is confirmed by email |
-| `status` | `pending` (new), `approved` (live), `closed` (unpublished) |
+| `status` | `pending` (new), `approved` (live), `closed` (unpublished), `rejected` |
 
 ## Approval
 
@@ -68,3 +68,7 @@ There is no admin login yet.
 Jobs 1 and 2 are set to `closed` by the migration when those rows exist.
 
 The homepage, job pages, and sitemap refresh at least every hour. `/jobs` checks the database on each request.
+
+## Resumes
+
+This project has no `resumes` storage bucket yet. CV upload on the apply form will fail until Justin decides how to set it up.

@@ -88,9 +88,11 @@ alter table public.jobs
 alter table public.jobs alter column status set default 'pending';
 
 alter table public.jobs drop constraint if exists jobs_status_check;
+update public.jobs set status = 'approved' where status = 'published';
+update public.jobs set status = 'pending' where status = 'draft';
 alter table public.jobs
   add constraint jobs_status_check
-  check (status in ('pending', 'approved', 'published', 'draft', 'closed', 'rejected'));
+  check (status in ('pending', 'approved', 'closed', 'rejected'));
 
 alter table public.jobs drop constraint if exists jobs_work_mode_check;
 alter table public.jobs
@@ -151,6 +153,7 @@ create index if not exists applications_job_id_idx on public.applications (job_i
 create or replace function public.assign_job_slug()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 declare
   base text;
@@ -188,7 +191,7 @@ alter table public.applications enable row level security;
 alter table public.contacts enable row level security;
 
 grant select, insert on table public.jobs to anon, authenticated;
-revoke update, delete on table public.jobs from anon;
+revoke update, delete, truncate on table public.jobs from anon, authenticated;
 
 do $$
 begin
