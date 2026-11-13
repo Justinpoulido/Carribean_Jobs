@@ -3,10 +3,6 @@ export const siteUrl = "https://carribeanjobs.online";
 
 export const siteName = "Caribbean Jobs";
 
-/**
- * Facebook Page that publishes the jobs on this board.
- * The exact Page URL was not in the repo, so this opens a Facebook search
- * for the site. Replace it with the Page URL when you have it.
- */
+/** Facebook Page that publishes the jobs on this board. */
 export const facebookPageUrl =
-  "https://www.facebook.com/search/top?q=carribeanjobs.online";
+  "https://www.facebook.com/profile.php?id=61591548955154";

@@ -78,7 +78,7 @@ Closed and expired jobs return a not-found page. They are left out of the sitema
 - The homepage shows the latest few open jobs.
 - If nothing is open, the board says: New jobs are posted daily, follow us on Facebook.
 
-The Facebook link is `facebookPageUrl` in `src/lib/site.ts`. It is a search for this site until the Page URL is pasted there.
+The Facebook link is `facebookPageUrl` in `src/lib/site.ts`: https://www.facebook.com/profile.php?id=61591548955154.
 
 ## Add a job from the GitHub API
 
