@@ -69,6 +69,10 @@ Jobs 1 and 2 are set to `closed` by the migration when those rows exist.
 
 The homepage, job pages, and sitemap refresh at least every hour. `/jobs` checks the database on each request.
 
-## Resumes
+## CVs
 
-This project has no `resumes` storage bucket yet. CV upload on the apply form will fail until Justin decides how to set it up.
+Applicants can upload a PDF, DOC, or DOCX up to 5 MB. The file goes into the private `resumes` storage bucket under a unique object name. `applications.resume_url` stores that object path, not a public URL.
+
+Visitors can upload into the bucket. They cannot read, list, update, or delete files. No page links to a CV.
+
+To open one, server code calls `createResumeSignedUrl` in `src/lib/resume-access.ts`. That uses `SUPABASE_SERVICE_ROLE_KEY` on the server and returns a link that expires after 60 seconds. Do not send the service-role key to the browser.

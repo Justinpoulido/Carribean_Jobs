@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 import { notifyNewJob } from "@/lib/notify";
 import { validateJobSubmission } from "@/lib/public-jobs";
 import { recordPost, tooManyPosts } from "@/lib/rate-limit";
+import {
+  resumeContentType,
+  resumeFileProblem,
+  resumeObjectName,
+} from "@/lib/resume-file";
 import { getSupabaseBrowserClient, getSupabasePublicServerClient, hasSupabaseConfig } from "@/lib/supabase";
 
 type ActionState = {
@@ -29,27 +34,37 @@ export async function submitApplication(
     };
   }
 
-  const supabase = getSupabaseBrowserClient();
+  const supabase = getSupabasePublicServerClient();
   if (!supabase) {
     return { ok: false, message: "Supabase is not configured." };
   }
 
   const resume = formData.get("resume");
-  let resumeUrl = "";
+  let resumePath = "";
 
   if (resume instanceof File && resume.size > 0) {
-    const extension = resume.name.split(".").pop() || "pdf";
-    const path = `applications/${crypto.randomUUID()}.${extension}`;
-    const { error } = await supabase.storage
-      .from("resumes")
-      .upload(path, resume, { upsert: false });
-
-    if (error) {
-      return { ok: false, message: error.message };
+    const problem = resumeFileProblem(resume);
+    if (problem) {
+      return { ok: false, message: problem };
+    }
+    const contentType = resumeContentType(resume.name, resume.type);
+    if (!contentType) {
+      return { ok: false, message: "CV must be a PDF, DOC, or DOCX file." };
     }
 
-    const { data } = supabase.storage.from("resumes").getPublicUrl(path);
-    resumeUrl = data.publicUrl;
+    resumePath = resumeObjectName(resume.name);
+    const { error } = await supabase.storage.from("resumes").upload(resumePath, resume, {
+      upsert: false,
+      contentType,
+    });
+
+    if (error) {
+      return {
+        ok: false,
+        message:
+          "The CV could not be uploaded. Use a PDF, DOC, or DOCX under 5 MB and try again.",
+      };
+    }
   }
 
   const { error } = await supabase.from("applications").insert({
@@ -58,7 +73,7 @@ export async function submitApplication(
     email: formData.get("email"),
     phone: formData.get("phone"),
     country: formData.get("country"),
-    resume_url: resumeUrl,
+    resume_url: resumePath,
     message: formData.get("message"),
   });
 
