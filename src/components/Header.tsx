@@ -30,13 +30,27 @@ export function Header() {
 
         <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-700 lg:flex">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="hover:text-[#0077b6]">
+            <Link
+              key={item.href}
+              href={item.href}
+              className={
+                item.href === "/jobs"
+                  ? "text-[#0077b6]"
+                  : "hover:text-[#0077b6]"
+              }
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/jobs"
+            className="rounded-lg px-3 py-2 text-sm font-bold text-[#0077b6] lg:hidden"
+          >
+            Jobs
+          </Link>
           <Link
             href="/post-job"
             className="rounded-lg bg-[#f59e0b] px-4 py-2 text-sm font-bold text-slate-950 shadow-sm transition hover:bg-[#fbbf24]"

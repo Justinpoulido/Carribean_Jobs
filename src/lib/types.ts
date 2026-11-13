@@ -17,7 +17,7 @@ export type Job = {
   application_email?: string;
   application_link?: string;
   is_featured: boolean;
-  status: "published" | "draft" | "closed";
+  status: "pending" | "approved" | "closed" | "rejected";
   created_at: string;
   source_id?: number | null;
   source_name?: string | null;

@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const resources = [
-  ["Resume tips", "Write a focused Caribbean-ready resume with clear wins, tools, and measurable impact."],
-  ["Cover letter template", "Adapt a simple opening, proof paragraph, and close for each employer."],
-  ["Interview questions", "Prepare answers for behavioral, technical, and culture-fit interviews."],
-  ["Remote work tips", "Set up routines, communication habits, and productivity signals for distributed teams."],
-  ["Best jobs by country", "Track demand across Trinidad, Jamaica, Barbados, Guyana, and more."],
-  ["Salary guide", "Compare compensation expectations by market, seniority, and job family."],
+  ["resume-tips", "Resume tips", "Write a focused Caribbean-ready resume with clear wins, tools, and measurable impact."],
+  ["cover-letter", "Cover letter template", "Adapt a simple opening, proof paragraph, and close for each employer."],
+  ["interview-questions", "Interview questions", "Prepare answers for behavioral, technical, and culture-fit interviews."],
+  ["remote-work-tips", "Remote work tips", "Set up routines, communication habits, and productivity signals for distributed teams."],
+  ["best-jobs-by-country", "Best jobs by country", "Track demand across Trinidad, Jamaica, Barbados, Guyana, and more."],
+  ["salary-guide", "Salary guide", "Compare compensation expectations by market, seniority, and job family."],
 ];
 
 export default function ResourcesPage() {
@@ -33,8 +33,8 @@ export default function ResourcesPage() {
           </div>
         </section>
         <section className="mx-auto grid max-w-7xl gap-5 px-4 py-10 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
-          {resources.map(([title, text]) => (
-            <article key={title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          {resources.map(([id, title, text]) => (
+            <article id={id} key={id} className="scroll-mt-24 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-bold text-slate-950">{title}</h2>
               <p className="mt-3 leading-7 text-slate-600">{text}</p>
             </article>

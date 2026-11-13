@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://caribbeanjobs.com"),
+  metadataBase: new URL("https://carribeanjobs.online"),
   title: {
     default: "Caribbean Jobs | Find Jobs Across the Caribbean",
     template: "%s | Caribbean Jobs",

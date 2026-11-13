@@ -1,3 +1,7 @@
+-- New projects should run supabase/migrations/20261113043000_jobs_board.sql
+-- instead of this earlier draft. That migration is idempotent and is the
+-- setup path documented in the README.
+
 create table if not exists public.job_sources (
   id bigint generated always as identity primary key,
   name text not null,
@@ -47,7 +51,7 @@ create table if not exists public.jobs (
   application_email text,
   application_link text,
   is_featured boolean not null default false,
-  status text not null default 'published',
+  status text not null default 'pending',
   source_id bigint references public.job_sources(id) on delete set null,
   source_name text,
   source_url text,
@@ -59,7 +63,7 @@ create table if not exists public.jobs (
   posted_at timestamptz,
   expires_at timestamptz,
   created_at timestamptz not null default now(),
-  constraint jobs_status_check check (status in ('published', 'draft', 'closed')),
+  constraint jobs_status_check check (status in ('pending', 'approved', 'closed', 'rejected')),
   constraint jobs_work_mode_check check (work_mode in ('Remote', 'On-site', 'Hybrid')),
   constraint jobs_import_status_check check (
     import_status in ('pending', 'approved', 'published', 'rejected')
@@ -122,14 +126,16 @@ alter table public.applications enable row level security;
 alter table public.contacts enable row level security;
 
 drop policy if exists "Public can read published jobs" on public.jobs;
-create policy "Public can read published jobs"
+drop policy if exists "Public can read approved jobs" on public.jobs;
+create policy "Public can read approved jobs"
   on public.jobs for select
-  using (status = 'published');
+  using (status = 'approved');
 
 drop policy if exists "Public can submit jobs" on public.jobs;
-create policy "Public can submit jobs"
+drop policy if exists "Public can submit pending jobs" on public.jobs;
+create policy "Public can submit pending jobs"
   on public.jobs for insert
-  with check (status in ('published', 'draft'));
+  with check (status = 'pending');
 
 drop policy if exists "Public can submit applications" on public.applications;
 create policy "Public can submit applications"
