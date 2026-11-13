@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, type FormEvent } from "react";
 import { X } from "lucide-react";
 import { submitApplication } from "@/app/actions";
 import { countries } from "@/data/jobs";
+import { resumeFileProblem } from "@/lib/resume-file";
 import { SubmitButton } from "./FormStatus";
 
 export function ApplicationModal({
@@ -14,10 +15,24 @@ export function ApplicationModal({
   jobTitle: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [fileError, setFileError] = useState("");
   const [state, formAction] = useActionState(submitApplication, {
     ok: false,
     message: "",
   });
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const input = event.currentTarget.elements.namedItem("resume");
+    const file = input instanceof HTMLInputElement ? input.files?.[0] : undefined;
+    if (!file) {
+      return;
+    }
+    const problem = resumeFileProblem(file);
+    if (problem) {
+      event.preventDefault();
+      setFileError(problem);
+    }
+  }
 
   return (
     <>
@@ -47,7 +62,7 @@ export function ApplicationModal({
                 <X size={18} aria-hidden="true" />
               </button>
             </div>
-            <form action={formAction} className="mt-6 grid gap-4">
+            <form action={formAction} onSubmit={handleSubmit} className="mt-6 grid gap-4">
               <input type="hidden" name="job_id" value={jobId} />
               <div className="grid gap-4 sm:grid-cols-2">
                 <input
@@ -89,10 +104,22 @@ export function ApplicationModal({
                 <input
                   name="resume"
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    setFileError(file ? resumeFileProblem(file) ?? "" : "");
+                  }}
                   className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm"
                 />
+                <span className="font-normal text-slate-500">
+                  PDF, DOC, or DOCX. 5 MB maximum.
+                </span>
               </label>
+              {fileError ? (
+                <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                  {fileError}
+                </p>
+              ) : null}
               <textarea
                 name="message"
                 rows={4}
