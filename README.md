@@ -16,9 +16,9 @@ Without Supabase environment variables the site still builds and shows “No ope
 ## Fresh Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open the SQL editor and run the whole file `supabase/migrations/20261113043000_jobs_board.sql`.
-   It creates `jobs` (and the related tables the site already uses), indexes, the slug trigger, and the row level security policies. It is safe to run more than once.
-   The same file sets `status = 'closed'` on job ids 1 and 2 when those rows exist, and does nothing when they do not.
+2. Open the SQL editor and run these files in order:
+   - `supabase/migrations/20261113043000_jobs_board.sql` creates `jobs` (and the related tables the site already uses), indexes, the slug trigger, and the row level security policies. It is safe to run more than once. It sets `status = 'closed'` on job ids 1 and 2 when those rows exist, and does nothing when they do not.
+   - `supabase/migrations/20261113210000_resumes_bucket.sql` creates the private `resumes` bucket and the upload-only storage policy.
 3. In Project Settings → API, copy the project URL and the anon public key.
 4. In Vercel → Project → Settings → Environment Variables, add the names below. Do not commit the values.
 
@@ -28,7 +28,7 @@ Without Supabase environment variables the site still builds and shows “No ope
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Vercel | Yes, to show and accept jobs | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Vercel | Yes, to show and accept jobs | Public anon key. Safe for the browser. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Vercel, server only | Only for the existing import cron | Bypasses row level security. Never use it in client code and never commit it. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Vercel, server only | For the import cron and for opening a stored CV | Bypasses row level security. Also used by `createResumeSignedUrl` to make a short-lived CV link. Never use it in client code and never commit it. |
 | `CONTACT_EMAIL` | Vercel | No | Footer address. Defaults to `hello@caribbeanjobs.com`. |
 | `NOTIFY_EMAIL` | Vercel | No | Inbox for new submissions. Defaults to `Jpoulido@gmail.com`. |
 | `RESEND_API_KEY` | Vercel, server only | No | Sends the notification. If it is missing, the submission is still saved. |

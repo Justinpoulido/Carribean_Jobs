@@ -33,6 +33,9 @@ test("accepts a pdf under 5 MB and rejects other files", () => {
 test("stores a unique sanitised object name", () => {
   const name = resumeObjectName("My CV (final).docx");
   assert.match(name, /^[0-9a-f-]{36}-my-cv-final\.docx$/);
+  const dotted = resumeObjectName("Jane..Smith.pdf");
+  assert.doesNotMatch(dotted, /\.\./);
+  assert.match(dotted, /^[0-9a-f-]{36}-jane\.smith\.pdf$/);
   assert.equal(
     resumeContentType("letter.doc", ""),
     "application/msword",
