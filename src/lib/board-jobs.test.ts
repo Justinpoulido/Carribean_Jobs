@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import {
   DEFAULT_COUNTRY,
+  countryCode,
+  formatJobDate,
   isClosingSoon,
   isJobVisible,
   normalizePlace,
@@ -39,7 +41,7 @@ test("live catalog and fixtures parse", () => {
     JSON.parse(readFileSync("data/jobs.json", "utf8")),
     "data/jobs.json",
   );
-  assert.deepEqual(live, []);
+  assert.ok(Array.isArray(live));
 
   const fixtures = parseJobCatalog(
     JSON.parse(readFileSync("data/jobs.fixtures.json", "utf8")),
@@ -141,11 +143,34 @@ test("hides closed jobs, passed closing dates, and undated jobs older than 30 da
   );
 });
 
-test("treats Trinidad & Tobago and Trinidad and Tobago as the same place", () => {
+test("accepts an empty catalog", () => {
+  assert.deepEqual(parseJobCatalog([], "test"), []);
+});
+
+test("treats equivalent country names as the same place", () => {
   assert.equal(
     normalizePlace("Trinidad & Tobago"),
     normalizePlace("Trinidad and Tobago"),
   );
+  assert.equal(countryCode("St. Lucia"), countryCode("Saint Lucia"));
+  assert.equal(countryCode("The Bahamas"), countryCode("Bahamas"));
+});
+
+test("accepts a same-day deadline and rejects an impossible timestamp", () => {
+  const job = one({
+    datePosted: "2026-11-13T12:00:00-04:00",
+    closingDate: "2026-11-13",
+  });
+  assert.equal(job?.closingDate, "2026-11-13");
+  assert.throws(
+    () => parseJobCatalog([entry({ datePosted: "2026-02-31T12:00:00Z" })], "test"),
+    /datePosted/,
+  );
+});
+
+test("formats a timestamp in Trinidad and Tobago and a date-only value as written", () => {
+  assert.equal(formatJobDate("2026-11-13T23:00:00-04:00"), "13 Nov 2026");
+  assert.equal(formatJobDate("2026-11-13"), "13 Nov 2026");
 });
 
 test("marks a job closing within 7 days", () => {

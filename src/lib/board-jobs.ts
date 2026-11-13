@@ -143,8 +143,18 @@ export function countryCode(country: string) {
   return COUNTRY_CODES[normalizePlace(country)];
 }
 
+export function countriesMatch(left: string, right: string) {
+  const leftCode = countryCode(left);
+  const rightCode = countryCode(right);
+  if (leftCode && rightCode) {
+    return leftCode === rightCode;
+  }
+  return normalizePlace(left) === normalizePlace(right);
+}
+
 export function formatJobDate(iso: string) {
-  const date = parseBoardDate(iso);
+  const hasTime = iso.length > 10;
+  const date = hasTime ? parseBoardDate(iso) : parseBoardDate(iso.slice(0, 10));
   if (!date) {
     return iso;
   }
@@ -153,7 +163,7 @@ export function formatJobDate(iso: string) {
     day: "numeric",
     month: "short",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: hasTime ? BOARD_TIME_ZONE : "UTC",
   }).format(date);
 }
 
@@ -259,8 +269,8 @@ export function parseJobCatalog(input: unknown, fileLabel: string): BoardJob[] {
     }
 
     if (datePosted && closingDate) {
-      const posted = parseBoardDate(datePosted);
-      const closing = parseBoardDate(closingDate);
+      const posted = postedInstant(datePosted);
+      const closing = closingInstant(closingDate);
       if (posted && closing && closing.getTime() < posted.getTime()) {
         problems.push(
           `${label}.closingDate must be on or after datePosted`,
@@ -645,34 +655,26 @@ export function parseBoardDate(value: string) {
   const year = Number(match[1]);
   const month = Number(match[2]);
   const day = Number(match[3]);
+  if (!isRealCalendarDate(year, month, day)) {
+    return null;
+  }
+
   const hasTime = value.length > 10;
   const date = new Date(hasTime ? value : `${value}T00:00:00.000Z`);
-
   if (Number.isNaN(date.getTime())) {
     return null;
   }
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() + 1 !== month ||
-    date.getUTCDate() !== day
-  ) {
-    if (!hasTime) {
-      return null;
-    }
-  }
-
-  if (!hasTime) {
-    const check = new Date(Date.UTC(year, month - 1, day));
-    if (
-      check.getUTCFullYear() !== year ||
-      check.getUTCMonth() + 1 !== month ||
-      check.getUTCDate() !== day
-    ) {
-      return null;
-    }
-  }
 
   return date;
+}
+
+function isRealCalendarDate(year: number, month: number, day: number) {
+  const check = new Date(Date.UTC(year, month - 1, day));
+  return (
+    check.getUTCFullYear() === year &&
+    check.getUTCMonth() + 1 === month &&
+    check.getUTCDate() === day
+  );
 }
 
 function postedInstant(value: string) {

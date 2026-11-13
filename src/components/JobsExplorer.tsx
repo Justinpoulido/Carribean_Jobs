@@ -5,8 +5,8 @@ import { JobCard } from "./JobCard";
 import { countries } from "@/data/jobs";
 import {
   JOB_TYPES,
+  countriesMatch,
   jobTypeLabel,
-  normalizePlace,
   type ListedJob,
 } from "@/lib/board-jobs";
 
@@ -19,9 +19,7 @@ export function JobsExplorer({
 }) {
   const [visibleCount, setVisibleCount] = useState(8);
   const [filters, setFilters] = useState({
-    keyword: [initialFilters.keyword, initialFilters.category]
-      .filter(Boolean)
-      .join(" "),
+    keyword: initialFilters.keyword || "",
     employer: initialFilters.employer || "",
     location: initialFilters.location || initialFilters.city || "",
     country: initialFilters.country || "",
@@ -32,7 +30,7 @@ export function JobsExplorer({
     const keyword = filters.keyword.trim().toLowerCase();
     const employer = filters.employer.trim().toLowerCase();
     const location = filters.location.trim().toLowerCase();
-    const country = normalizePlace(filters.country);
+    const country = filters.country.trim();
 
     return jobs.filter((job) => {
       const haystack = [
@@ -54,8 +52,7 @@ export function JobsExplorer({
       const matchesLocation =
         !location ||
         `${job.location} ${job.country}`.toLowerCase().includes(location);
-      const matchesCountry =
-        !country || normalizePlace(job.country) === country;
+      const matchesCountry = !country || countriesMatch(job.country, country);
       const matchesType = !filters.jobType || job.jobType === filters.jobType;
 
       return (

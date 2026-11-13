@@ -4,7 +4,7 @@ import { ArrowRight, BriefcaseBusiness } from "lucide-react";
 export function CategoryCard({ category }: { category: string }) {
   return (
     <Link
-      href={`/jobs?category=${encodeURIComponent(category)}`}
+      href="/jobs"
       className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#0077b6] hover:shadow-md"
     >
       <span className="flex items-center gap-3">
