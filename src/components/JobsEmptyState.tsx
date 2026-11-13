@@ -1,4 +1,4 @@
-import { facebookPageUrl } from "@/lib/site";
+import Link from "next/link";
 
 export function JobsEmptyState() {
   return (
@@ -6,18 +6,13 @@ export function JobsEmptyState() {
       <p className="text-sm font-bold uppercase tracking-wide text-[#0077b6]">
         Jobs board
       </p>
-      <h2 className="mt-3 text-2xl font-bold text-slate-950">
-        No open jobs right now
-      </h2>
       <p className="mx-auto mt-3 max-w-xl text-lg leading-8 text-slate-600">
-        New jobs are posted daily, follow us on{" "}
-        <a
-          href={facebookPageUrl}
+        <Link
+          href="/post-job"
           className="font-bold text-[#0077b6] underline decoration-[#0077b6]/30 underline-offset-4"
         >
-          Facebook
-        </a>
-        .
+          No open roles yet — employers, post a vacancy
+        </Link>
       </p>
     </div>
   );

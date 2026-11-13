@@ -48,7 +48,7 @@ function normalizeJob(source: JobSource, job: ImportedJob) {
     application_email: "",
     application_link: job.apply_url || job.source_url,
     is_featured: false,
-    status: source.trusted_auto_publish ? "published" : "draft",
+    status: source.trusted_auto_publish ? "approved" : "pending",
     source_id: source.id,
     source_name: source.name,
     source_url: job.source_url,

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getVisibleJobs } from "@/lib/load-board-jobs";
+import { getListedJobs } from "@/lib/load-public-jobs";
 import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600;
@@ -14,8 +14,8 @@ const staticPaths = [
   "/post-job",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const jobs = getVisibleJobs();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const jobs = await getListedJobs();
 
   return [
     ...staticPaths.map((path) => ({
@@ -24,8 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: path === "/" || path === "/jobs" ? 1 : 0.6,
     })),
     ...jobs.map((job) => ({
-      url: new URL(`/jobs/${job.id}`, siteUrl).toString(),
-      lastModified: job.datePosted,
+      url: new URL(`/jobs/${job.slug}`, siteUrl).toString(),
+      lastModified: job.postedAt,
       changeFrequency: "daily" as const,
       priority: 0.8,
     })),

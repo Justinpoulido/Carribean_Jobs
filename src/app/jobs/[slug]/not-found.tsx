@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { facebookPageUrl } from "@/lib/site";
 
 export default function JobNotFound() {
   return (
@@ -13,25 +12,25 @@ export default function JobNotFound() {
             Jobs board
           </p>
           <h1 className="mt-3 text-4xl font-black text-slate-950">
-            This job is no longer listed
+            This job is not listed
           </h1>
           <p className="mt-4 text-lg leading-8 text-slate-600">
-            It may have closed or passed its closing date. New jobs are posted
-            daily, follow us on{" "}
-            <a
-              href={facebookPageUrl}
-              className="font-bold text-[#0077b6] underline decoration-[#0077b6]/30 underline-offset-4"
-            >
-              Facebook
-            </a>
-            .
+            It is unpublished, or it was never an approved vacancy.
           </p>
-          <Link
-            href="/jobs"
-            className="mt-8 inline-flex rounded-lg bg-[#0077b6] px-5 py-3 font-bold text-white"
-          >
-            Back to the jobs board
-          </Link>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/jobs"
+              className="inline-flex rounded-lg bg-[#0077b6] px-5 py-3 font-bold text-white"
+            >
+              Back to the jobs board
+            </Link>
+            <Link
+              href="/post-job"
+              className="inline-flex rounded-lg border border-[#0077b6] px-5 py-3 font-bold text-[#0077b6]"
+            >
+              Post a vacancy
+            </Link>
+          </div>
         </section>
       </main>
       <Footer />

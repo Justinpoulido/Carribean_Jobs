@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "scripts", "src/lib/board-jobs.test.ts"]
+  "exclude": ["node_modules", "src/lib/public-jobs.test.ts"]
 }

@@ -14,7 +14,7 @@ import { JobCard } from "@/components/JobCard";
 import { CategoryCard } from "@/components/CategoryCard";
 import { categories, countries } from "@/data/jobs";
 import { JobsEmptyState } from "@/components/JobsEmptyState";
-import { getListedJobs } from "@/lib/load-board-jobs";
+import { getListedJobs } from "@/lib/load-public-jobs";
 
 export const revalidate = 3600;
 
@@ -25,14 +25,15 @@ const steps = [
 ];
 
 const resources = [
-  "Resume tips",
-  "Cover letter template",
-  "Interview questions",
-  "Remote work tips",
+  ["Resume tips", "/resources#resume-tips"],
+  ["Cover letter template", "/resources#cover-letter"],
+  ["Interview questions", "/resources#interview-questions"],
+  ["Remote work tips", "/resources#remote-work-tips"],
 ];
 
-export default function Home() {
-  const latestJobs = getListedJobs().slice(0, 3);
+export default async function Home() {
+  const listedJobs = await getListedJobs();
+  const latestJobs = listedJobs.slice(0, 3);
   const featured = latestJobs[0];
 
   return (
@@ -81,11 +82,13 @@ export default function Home() {
                     </p>
                     <h2 className="mt-1 text-2xl font-bold">
                       {featured ? (
-                        <Link href={`/jobs/${featured.id}`} className="hover:text-[#0077b6]">
+                        <Link href={`/jobs/${featured.slug}`} className="hover:text-[#0077b6]">
                           {featured.title}
                         </Link>
                       ) : (
-                        "New jobs are posted daily"
+                        <Link href="/post-job" className="hover:text-[#0077b6]">
+                          No open roles yet — employers, post a vacancy
+                        </Link>
                       )}
                     </h2>
                   </div>
@@ -93,8 +96,8 @@ export default function Home() {
                 </div>
                 <p className="mt-3 text-slate-600">
                   {featured
-                    ? `${featured.employer} - ${featured.location}`
-                    : "Follow us on Facebook, then open the jobs board for how to apply."}
+                    ? `${featured.companyName} - ${featured.city}`
+                    : "Approved vacancies from the jobs board will show up here."}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -105,9 +108,9 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="rounded-lg bg-white/90 p-5 text-slate-950">
-                  <p className="text-3xl font-black">24h</p>
+                  <p className="text-3xl font-black">{listedJobs.length}</p>
                   <p className="text-sm font-semibold text-slate-600">
-                    Fast apply
+                    Open roles
                   </p>
                 </div>
               </div>
@@ -228,13 +231,13 @@ export default function Home() {
               Prepare for the next step
             </h2>
             <div className="mt-6 grid gap-3">
-              {resources.map((resource) => (
+              {resources.map(([label, href]) => (
                 <Link
-                  href="/resources"
-                  key={resource}
+                  href={href}
+                  key={href}
                   className="rounded-lg border border-slate-200 bg-white p-4 font-bold text-slate-800 shadow-sm hover:text-[#0077b6]"
                 >
-                  {resource}
+                  {label}
                 </Link>
               ))}
             </div>

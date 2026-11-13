@@ -1,3 +1,7 @@
+-- New projects should run supabase/migrations/20261113043000_jobs_board.sql
+-- instead of this earlier draft. That migration is idempotent and is the
+-- setup path documented in the README.
+
 create table if not exists public.job_sources (
   id bigint generated always as identity primary key,
   name text not null,

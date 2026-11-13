@@ -1,7 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getSupabaseBrowserClient, hasSupabaseConfig } from "@/lib/supabase";
+import { notifyNewJob } from "@/lib/notify";
+import { validateJobSubmission } from "@/lib/public-jobs";
+import { recordPost, tooManyPosts } from "@/lib/rate-limit";
+import { getSupabaseBrowserClient, getSupabasePublicServerClient, hasSupabaseConfig } from "@/lib/supabase";
 
 type ActionState = {
   ok: boolean;
@@ -65,49 +69,82 @@ export async function submitApplication(
   return { ok: true, message: "Application submitted. Good luck!" };
 }
 
+const pendingMessage =
+  "Thanks. This vacancy is pending review and is not on the public board yet.";
+
 export async function createJobPost(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  if (String(formData.get("company_website") || "").trim()) {
+    return { ok: true, message: pendingMessage };
+  }
+
+  const salaryMin = numberFromForm(formData.get("salary_min"));
+  const salaryMax = numberFromForm(formData.get("salary_max"));
+  const validated = validateJobSubmission({
+    title: String(formData.get("title") || ""),
+    companyName: String(formData.get("company_name") || ""),
+    city: String(formData.get("city") || ""),
+    country: String(formData.get("country") || ""),
+    category: String(formData.get("category") || ""),
+    jobType: String(formData.get("job_type") || ""),
+    workMode: String(formData.get("work_mode") || ""),
+    description: String(formData.get("description") || ""),
+    requirements: String(formData.get("requirements") || ""),
+    salaryMin: formData.get("salary_min") ? salaryMin : null,
+    salaryMax: formData.get("salary_max") ? salaryMax : null,
+    currency: String(formData.get("currency") || ""),
+    payPeriod: String(formData.get("pay_period") || ""),
+    applicationEmail: String(formData.get("application_email") || ""),
+    applicationUrl: String(formData.get("application_link") || ""),
+    closingDate: String(formData.get("closing_date") || ""),
+    posterName: String(formData.get("poster_name") || ""),
+    posterEmail: String(formData.get("contact_email") || ""),
+    featured: formData.get("is_featured") === "on",
+  });
+
+  if (!validated.ok) {
+    return { ok: false, message: validated.message };
+  }
+
   if (!hasSupabaseConfig()) {
     return {
-      ok: true,
-      message: "Job saved in demo mode. Connect Supabase to persist new posts.",
+      ok: false,
+      message: "The jobs board is not connected yet, so this vacancy was not saved.",
     };
   }
 
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) {
-    return { ok: false, message: "Supabase is not configured." };
+  const headerList = await headers();
+  const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (tooManyPosts(ip)) {
+    return {
+      ok: false,
+      message: "Please wait a little while before posting another vacancy.",
+    };
   }
 
-  const { error } = await supabase.from("jobs").insert({
-    title: formData.get("title"),
-    company_name: formData.get("company_name"),
-    contact_email: formData.get("contact_email"),
-    country: formData.get("country"),
-    city: formData.get("city"),
-    category: formData.get("category"),
-    job_type: formData.get("job_type"),
-    work_mode: formData.get("work_mode"),
-    salary_min: numberFromForm(formData.get("salary_min")),
-    salary_max: numberFromForm(formData.get("salary_max")),
-    description: formData.get("description"),
-    requirements: formData.get("requirements"),
-    responsibilities: formData.get("responsibilities"),
-    benefits: formData.get("benefits"),
-    application_email: formData.get("application_email"),
-    application_link: formData.get("application_link"),
-    is_featured: formData.get("is_featured") === "on",
-    status: "published",
-  });
+  const supabase = getSupabasePublicServerClient();
+  if (!supabase) {
+    return { ok: false, message: "The jobs board is not connected yet." };
+  }
 
+  const { error } = await supabase.from("jobs").insert(validated.value);
   if (error) {
     return { ok: false, message: error.message };
   }
 
+  recordPost(ip);
+  await notifyNewJob({
+    title: validated.value.title,
+    company: validated.value.company_name,
+    city: validated.value.city,
+    country: validated.value.country,
+    posterEmail: validated.value.contact_email,
+  });
+  revalidatePath("/");
   revalidatePath("/jobs");
-  return { ok: true, message: "Job posted successfully." };
+  return { ok: true, message: pendingMessage };
 }
 
 export async function submitContact(
