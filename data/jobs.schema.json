@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://carribeanjobs.online/schemas/jobs.json",
+  "title": "Caribbean Jobs board",
+  "description": "JSON array consumed by the public jobs board. An empty array is valid. The site hides status \"closed\", jobs whose closingDate has passed, and jobs with no closingDate that were posted more than 30 days ago. See JOBS.md.",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/job"
+  },
+  "$defs": {
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "employer",
+        "location",
+        "description",
+        "howToApply",
+        "sourceName",
+        "datePosted",
+        "status"
+      ],
+      "anyOf": [
+        {
+          "required": ["applyUrl"]
+        },
+        {
+          "required": ["applyEmail"]
+        }
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "Stable unique slug, for example employer-title-yyyymmdd. Used in /jobs/[id]."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "employer": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140
+        },
+        "location": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140,
+          "description": "City, town, or workplace, such as Port of Spain or Piarco International Airport."
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Defaults to Trinidad and Tobago when omitted.",
+          "default": "Trinidad and Tobago"
+        },
+        "jobType": {
+          "type": "string",
+          "enum": [
+            "full-time",
+            "part-time",
+            "contract",
+            "temporary",
+            "internship",
+            "freelance",
+            "casual"
+          ]
+        },
+        "salary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Free text, for example TTD 8,000 per month. Omit when unknown."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 5000
+        },
+        "highlights": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "howToApply": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 2000,
+          "description": "Plain-language instructions shown in the How to apply section."
+        },
+        "applyUrl": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "^https?://",
+          "description": "Original employer or job-board application URL. Required when applyEmail is absent."
+        },
+        "applyEmail": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160,
+          "format": "email",
+          "description": "Application inbox. Required when applyUrl is absent."
+        },
+        "sourceName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140,
+          "description": "Name of the employer site or board the posting came from."
+        },
+        "datePosted": {
+          "type": "string",
+          "description": "ISO date (YYYY-MM-DD) or ISO date-time. Date-only values start at midnight in Trinidad and Tobago."
+        },
+        "closingDate": {
+          "type": "string",
+          "description": "Optional ISO date or date-time. A date-only value stays open through the end of that day in Trinidad and Tobago. After it passes, the job is hidden even if status is open."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "closed"]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+[
+  {
+    "id": "massy-stores-sales-associate-20261020",
+    "title": "Sales Associate",
+    "employer": "Massy Stores",
+    "location": "Trincity Mall, Trincity",
+    "country": "Trinidad and Tobago",
+    "jobType": "full-time",
+    "salary": "TTD 5,500–6,500 per month",
+    "description": "Serve customers on the shop floor at the Trincity supermarket, keep shelves stocked, and help shoppers find grocery and household items during weekday and weekend shifts.",
+    "highlights": [
+      "Full-time shifts, including one weekend day",
+      "Training on the till and customer service",
+      "Staff discount at Massy Stores"
+    ],
+    "howToApply": "Apply on the Massy Stores website. Mention the Sales Associate role at Trincity Mall and include a phone number where the store can reach you.",
+    "applyUrl": "https://www.massystores.com/",
+    "sourceName": "Massy Stores",
+    "datePosted": "2026-10-20",
+    "closingDate": "2026-11-03",
+    "status": "closed"
+  },
+  {
+    "id": "republic-bank-customer-service-representative-20261015",
+    "title": "Customer Service Representative",
+    "employer": "Republic Bank",
+    "location": "Independence Square, Port of Spain",
+    "country": "Trinidad and Tobago",
+    "jobType": "full-time",
+    "salary": "Competitive, based on experience",
+    "description": "Handle walk-in and phone enquiries at a Port of Spain branch, open and service accounts, and resolve routine banking requests while following Republic Bank's compliance checks.",
+    "highlights": [
+      "Branch role in Port of Spain",
+      "Customer service or cashier experience is useful",
+      "On-the-job training provided"
+    ],
+    "howToApply": "Submit an application through the Republic Bank website. Include a résumé and say you are applying for the Customer Service Representative vacancy in Port of Spain.",
+    "applyUrl": "https://www.republictt.com/",
+    "sourceName": "Republic Bank",
+    "datePosted": "2026-10-15",
+    "closingDate": "2026-10-31",
+    "status": "closed"
+  },
+  {
+    "id": "caribbean-airlines-airport-services-agent-20261028",
+    "title": "Airport Services Agent",
+    "employer": "Caribbean Airlines",
+    "location": "Piarco International Airport",
+    "jobType": "full-time",
+    "description": "Check in passengers, tag baggage, and answer flight questions at Piarco International Airport. The roster includes early mornings, evenings, weekends, and public holidays.",
+    "highlights": [
+      "Based at Piarco International Airport",
+      "Shift work, including weekends and public holidays",
+      "Customer service experience preferred"
+    ],
+    "howToApply": "Apply on the Caribbean Airlines website and select the Airport Services Agent vacancy for Piarco. Have identification and a résumé ready before you start the form.",
+    "applyUrl": "https://www.caribbean-airlines.com/",
+    "sourceName": "Caribbean Airlines",
+    "datePosted": "2026-10-28",
+    "closingDate": "2026-11-10",
+    "status": "closed"
+  }
+]

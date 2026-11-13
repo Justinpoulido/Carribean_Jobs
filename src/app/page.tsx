@@ -12,11 +12,15 @@ import { SearchBar } from "@/components/SearchBar";
 import { CountryCard } from "@/components/CountryCard";
 import { JobCard } from "@/components/JobCard";
 import { CategoryCard } from "@/components/CategoryCard";
-import { categories, countries, sampleJobs } from "@/data/jobs";
+import { categories, countries } from "@/data/jobs";
+import { JobsEmptyState } from "@/components/JobsEmptyState";
+import { getListedJobs } from "@/lib/load-board-jobs";
+
+export const revalidate = 3600;
 
 const steps = [
-  ["Search jobs", "Filter by country, company, category, salary, or work mode."],
-  ["Apply quickly", "Send your details, resume, and short message in minutes."],
+  ["Search jobs", "Filter the jobs board by keyword, employer, or location."],
+  ["See how to apply", "Each listing includes the employer's link or email."],
   ["Get hired", "Connect directly with employers building Caribbean teams."],
 ];
 
@@ -28,6 +32,9 @@ const resources = [
 ];
 
 export default function Home() {
+  const latestJobs = getListedJobs().slice(0, 3);
+  const featured = latestJobs[0];
+
   return (
     <>
       <Header />
@@ -70,16 +77,24 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-bold text-[#0077b6]">
-                      Featured today
+                      {featured ? "Latest job" : "Jobs board"}
                     </p>
                     <h2 className="mt-1 text-2xl font-bold">
-                      {sampleJobs[0].title}
+                      {featured ? (
+                        <Link href={`/jobs/${featured.id}`} className="hover:text-[#0077b6]">
+                          {featured.title}
+                        </Link>
+                      ) : (
+                        "New jobs are posted daily"
+                      )}
                     </h2>
                   </div>
                   <Sparkles className="text-[#f59e0b]" aria-hidden="true" />
                 </div>
                 <p className="mt-3 text-slate-600">
-                  {sampleJobs[0].company_name} - {sampleJobs[0].country}
+                  {featured
+                    ? `${featured.employer} - ${featured.location}`
+                    : "Follow us on Facebook, then open the jobs board for how to apply."}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -126,21 +141,27 @@ export default function Home() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-bold uppercase tracking-wide text-[#0077b6]">
-                  Featured jobs
+                  Jobs board
                 </p>
                 <h2 className="text-3xl font-bold text-slate-950">
-                  New opportunities from regional employers
+                  Latest openings
                 </h2>
               </div>
               <Link href="/jobs" className="font-bold text-[#0077b6]">
-                See more
+                See the jobs board
               </Link>
             </div>
-            <div className="mt-8 grid gap-4">
-              {sampleJobs.slice(0, 3).map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
-            </div>
+            {latestJobs.length > 0 ? (
+              <div className="mt-8 grid gap-4">
+                {latestJobs.map((job) => (
+                  <JobCard key={job.id} job={job} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8">
+                <JobsEmptyState />
+              </div>
+            )}
           </div>
         </section>
 

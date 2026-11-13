@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Globe2, Mail, Share2, Users } from "lucide-react";
 import { countries } from "@/data/jobs";
+import { facebookPageUrl } from "@/lib/site";
 
 const quickLinks = [
   ["Jobs", "/jobs"],
@@ -54,7 +55,11 @@ export function Footer() {
             from across the region.
           </p>
           <div className="mt-5 flex gap-3 text-blue-100">
-            <a href="#" aria-label="Social profile" className="hover:text-white">
+            <a
+              href={facebookPageUrl}
+              aria-label="Caribbean Jobs on Facebook"
+              className="hover:text-white"
+            >
               <Share2 size={20} />
             </a>
             <a href="#" aria-label="Community" className="hover:text-white">

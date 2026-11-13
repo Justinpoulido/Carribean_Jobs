@@ -1,3 +1,5 @@
+// Legacy Supabase reader for the import tools. The public board reads
+// data/jobs.json through src/lib/load-board-jobs.ts.
 import { sampleJobs } from "@/data/jobs";
 import { getSupabasePublicServerClient } from "@/lib/supabase";
 import type { Job } from "@/lib/types";
