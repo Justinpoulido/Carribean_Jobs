@@ -5,6 +5,7 @@ import {
   cityProblem,
   formatJobDate,
   formatSalary,
+  countListedCountries,
   isExpired,
   isOpenJob,
   validateJobSubmission,
@@ -54,6 +55,19 @@ test("hides closed, expired, pending, and apply-less jobs", () => {
   assert.equal(
     isOpenJob(job({ applicationEmail: null, applicationUrl: null })),
     false,
+  );
+});
+
+test("counts open-board countries by country code, not spelling", () => {
+  assert.equal(countListedCountries([]), 0);
+  assert.equal(
+    countListedCountries([
+      job({ country: "The Bahamas" }),
+      job({ country: "Bahamas" }),
+      job({ country: "Barbados" }),
+      job({ country: "Trinidad & Tobago" }),
+    ]),
+    3,
   );
 });
 

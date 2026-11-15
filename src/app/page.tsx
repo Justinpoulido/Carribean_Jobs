@@ -10,6 +10,7 @@ import { CategoryCard } from "@/components/CategoryCard";
 import { JobsEmptyState } from "@/components/JobsEmptyState";
 import { categories, countries } from "@/data/jobs";
 import { getListedJobs } from "@/lib/load-public-jobs";
+import { countListedCountries } from "@/lib/public-jobs";
 import {
   ArrowDoodle,
   BoatDoodle,
@@ -24,7 +25,7 @@ import {
   WaveDivider,
 } from "@/components/Doodles";
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 const steps = [
   {
@@ -53,6 +54,8 @@ const resources = [
 
 export default async function Home() {
   const listedJobs = await getListedJobs();
+  const openRoleCount = listedJobs.length;
+  const countryCount = countListedCountries(listedJobs);
   const latestJobs = listedJobs.slice(0, 3);
 
   return (
@@ -140,13 +143,14 @@ export default async function Home() {
                     The board right now
                   </p>
                   <p className="mt-2 leading-7 text-white/75">
-                    Live vacancies from employers and public listings across
-                    eight Caribbean countries.
+                    Live vacancies from employers and public listings across{" "}
+                    {countryCount} Caribbean{" "}
+                    {countryCount === 1 ? "country" : "countries"}.
                   </p>
                 </div>
                 <div className="rounded-brand-lg border border-white/15 bg-white/8 p-6 backdrop-blur-sm">
                   <p className="font-display text-[44px] font-bold leading-none text-sun">
-                    8
+                    {countryCount}
                   </p>
                   <p className="mt-2 text-[14px] font-semibold text-white/70">
                     Countries
@@ -155,9 +159,9 @@ export default async function Home() {
                 <div className="rounded-brand-lg border border-white/15 bg-white/8 p-6 backdrop-blur-sm">
                   <p
                     className="font-display text-[44px] font-bold leading-none text-sun"
-                    data-count-to={listedJobs.length}
+                    data-count-to={openRoleCount}
                   >
-                    {listedJobs.length}
+                    {openRoleCount}
                   </p>
                   <p className="mt-2 text-[14px] font-semibold text-white/70">
                     Open roles
