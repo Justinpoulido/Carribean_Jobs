@@ -172,6 +172,12 @@ export function countriesMatch(left: string, right: string) {
   return normalizePlace(left) === normalizePlace(right);
 }
 
+export function countListedCountries(jobs: { country: string }[]) {
+  return new Set(
+    jobs.map((job) => countryCode(job.country) || normalizePlace(job.country)),
+  ).size;
+}
+
 export function slugify(value: string) {
   return value
     .toLowerCase()
