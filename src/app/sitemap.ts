@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getListedJobs } from "@/lib/load-public-jobs";
+import { getPublishedTips } from "@/lib/load-tips";
 import { siteUrl } from "@/lib/site";
 
 export const revalidate = 3600;
@@ -10,12 +11,13 @@ const staticPaths = [
   "/about",
   "/employers",
   "/resources",
+  "/tips",
   "/contact",
   "/post-job",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const jobs = await getListedJobs();
+  const [jobs, tips] = await Promise.all([getListedJobs(), getPublishedTips()]);
 
   return [
     ...staticPaths.map((path) => ({
@@ -28,6 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: job.postedAt,
       changeFrequency: "daily" as const,
       priority: 0.8,
+    })),
+    ...tips.map((tip) => ({
+      url: new URL(`/tips/${tip.slug}`, siteUrl).toString(),
+      lastModified: tip.publishedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
     })),
   ];
 }
