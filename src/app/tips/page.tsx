@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Motion } from "@/components/Motion";
+import { PageHero } from "@/components/PageHero";
 import { TipCard } from "@/components/TipCard";
 import { TipsEmptyState } from "@/components/TipsEmptyState";
 import { getPublishedTips } from "@/lib/load-tips";
@@ -36,40 +38,32 @@ export default async function TipsPage() {
   return (
     <>
       <Header />
-      <main className="bg-slate-50">
-        <section className="bg-[linear-gradient(135deg,#06283d,#0077b6)] text-white">
-          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-            <p className="text-sm font-bold uppercase tracking-wide text-[#fbbf24]">
-              Career tips
-            </p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black sm:text-5xl">
-              Get hired in the Caribbean
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg leading-8 text-blue-100">
-              Short, practical advice from the Caribbean Jobs Facebook Page, from
-              your first application to your first week on the job.
-            </p>
-            {categories.length > 1 ? (
-              <nav aria-label="Tip categories" className="mt-8 flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <a
-                    key={category}
-                    href={`#${categoryAnchor(category)}`}
-                    className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold transition hover:bg-white/25"
-                  >
-                    {category}
-                  </a>
-                ))}
-              </nav>
-            ) : null}
-          </div>
-        </section>
+      <main id="main">
+        <PageHero
+          kicker="Career tips"
+          title="Get hired in the Caribbean"
+          lead="Short, practical advice from the Caribbean Jobs Facebook Page, from your first application to your first week on the job."
+        >
+          {categories.length > 1 ? (
+            <nav aria-label="Tip categories" className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <a
+                  key={category}
+                  href={`#${categoryAnchor(category)}`}
+                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[14px] font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-sun hover:bg-sun hover:text-ocean"
+                >
+                  {category}
+                </a>
+              ))}
+            </nav>
+          ) : null}
+        </PageHero>
 
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pb-20 pt-12 sm:px-6 lg:px-8">
           {tips.length === 0 ? (
             <TipsEmptyState />
           ) : (
-            <div className="grid gap-12">
+            <div className="grid gap-16">
               {categories.map((category) => {
                 const inCategory = tips.filter((tip) => tip.category === category);
                 return (
@@ -77,22 +71,32 @@ export default async function TipsPage() {
                     key={category}
                     id={categoryAnchor(category)}
                     aria-labelledby={`${categoryAnchor(category)}-title`}
-                    className="scroll-mt-24"
+                    className="scroll-mt-28"
                   >
-                    <div className="flex items-baseline justify-between gap-4">
+                    <div
+                      className="flex items-baseline justify-between gap-4 border-b-2 border-ocean/10 pb-4"
+                      data-reveal
+                    >
                       <h2
                         id={`${categoryAnchor(category)}-title`}
-                        className="text-2xl font-black text-slate-950"
+                        className="font-display text-[clamp(1.6rem,3vw,2.1rem)] font-bold text-ocean"
                       >
                         {category}
                       </h2>
-                      <span className="text-sm font-semibold text-slate-500">
-                        {inCategory.length} {inCategory.length === 1 ? "tip" : "tips"}
+                      <span className="shrink-0 font-semibold text-ink-soft">
+                        {inCategory.length}{" "}
+                        {inCategory.length === 1 ? "tip" : "tips"}
                       </span>
                     </div>
-                    <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                      {inCategory.map((tip) => (
-                        <TipCard key={tip.id} tip={tip} />
+                    <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                      {inCategory.map((tip, index) => (
+                        <div
+                          key={tip.id}
+                          data-reveal
+                          data-reveal-delay={String((index % 3) * 80)}
+                        >
+                          <TipCard tip={tip} />
+                        </div>
                       ))}
                     </div>
                   </section>
@@ -101,16 +105,21 @@ export default async function TipsPage() {
             </div>
           )}
 
-          <section className="mt-12 flex flex-col items-start justify-between gap-4 rounded-lg border border-[#f59e0b] bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+          <section
+            className="mt-16 flex flex-col items-start justify-between gap-5 rounded-brand-lg border-2 border-sun bg-white p-7 sm:flex-row sm:items-center sm:p-8"
+            data-reveal
+          >
             <div>
-              <h2 className="text-xl font-bold text-slate-950">Ready to put a tip to work?</h2>
-              <p className="mt-1 text-slate-600">
+              <h2 className="font-display text-[23px] font-bold text-ocean">
+                Ready to put a tip to work?
+              </h2>
+              <p className="mt-1.5 leading-7 text-ink-soft">
                 Browse approved vacancies across the region.
               </p>
             </div>
             <Link
               href="/jobs"
-              className="inline-flex rounded-lg bg-[#f59e0b] px-5 py-3 font-bold text-slate-950 shadow-sm transition hover:bg-[#fbbf24]"
+              className="inline-flex min-h-13 shrink-0 items-center justify-center rounded-full bg-sun px-7 font-bold text-ocean shadow-[0_5px_0_var(--color-sun-deep)] transition-all duration-200 ease-brand hover:-translate-y-0.5 hover:shadow-[0_8px_0_var(--color-sun-deep)]"
             >
               Browse jobs
             </Link>
@@ -118,6 +127,7 @@ export default async function TipsPage() {
         </div>
       </main>
       <Footer />
+      <Motion />
     </>
   );
 }

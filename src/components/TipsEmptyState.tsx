@@ -1,21 +1,25 @@
 import Link from "next/link";
+import { CompassDoodle } from "@/components/Doodles";
 
 export function TipsEmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center shadow-sm">
-      <p className="text-sm font-bold uppercase tracking-wide text-[#0077b6]">
-        Career tips
+    <div className="rounded-brand-lg border-2 border-dashed border-ocean/20 bg-white px-6 py-14 text-center">
+      <CompassDoodle
+        className="mx-auto h-16 w-16 text-turq animate-float"
+        strokeWidth={4}
+      />
+      <p className="mt-5 font-display text-[22px] font-bold text-ocean">
+        No career tips yet
       </p>
-      <p className="mx-auto mt-3 max-w-xl text-lg leading-8 text-slate-600">
-        No career tips yet. Check back soon, or{" "}
-        <Link
-          href="/jobs"
-          className="font-bold text-[#0077b6] underline decoration-[#0077b6]/30 underline-offset-4"
-        >
-          browse open jobs
-        </Link>
-        .
+      <p className="mx-auto mt-2 max-w-xl leading-7 text-ink-soft">
+        Check back soon — or go straight to the openings.
       </p>
+      <Link
+        href="/jobs"
+        className="mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-ocean px-7 font-bold text-white transition-transform duration-200 hover:-translate-y-0.5"
+      >
+        Browse open jobs
+      </Link>
     </div>
   );
 }

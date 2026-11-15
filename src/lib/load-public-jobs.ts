@@ -35,21 +35,42 @@ type JobRow = {
   expires_at?: string | null;
 };
 
+const PAGE_SIZE = 1000;
+
 const loadApprovedRows = cache(async () => {
   try {
     const supabase = getSupabasePublicServerClient();
     if (!supabase) {
       return [];
     }
-    const { data, error } = await supabase
-      .from("jobs")
-      .select("*")
-      .eq("status", "approved");
-    if (error) {
-      console.error("Unable to load jobs", error.message);
-      return [];
+
+    const rows: JobRow[] = [];
+    let from = 0;
+
+    while (true) {
+      const { data, error, count } = await supabase
+        .from("jobs")
+        .select("*", { count: "exact" })
+        .eq("status", "approved")
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) {
+        console.error("Unable to load jobs", error.message);
+        return [];
+      }
+
+      const page = (data || []) as JobRow[];
+      rows.push(...page);
+
+      if (page.length < PAGE_SIZE) {
+        break;
+      }
+      if (count != null && rows.length >= count) {
+        break;
+      }
+      from += PAGE_SIZE;
     }
-    return (data || []) as JobRow[];
+
+    return rows;
   } catch (error) {
     console.error("Unable to load jobs", error);
     return [];
