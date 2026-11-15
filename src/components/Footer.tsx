@@ -7,6 +7,7 @@ const quickLinks = [
   ["Jobs", "/jobs"],
   ["Employers", "/employers"],
   ["Resources", "/resources"],
+  ["Career tips", "/tips"],
   ["About", "/about"],
   ["Contact", "/contact"],
 ];

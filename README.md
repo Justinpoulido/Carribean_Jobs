@@ -19,6 +19,8 @@ Without Supabase environment variables the site still builds and shows “No ope
 2. Open the SQL editor and run these files in order:
    - `supabase/migrations/20261113043000_jobs_board.sql` creates `jobs` (and the related tables the site already uses), indexes, the slug trigger, and the row level security policies. It is safe to run more than once. It sets `status = 'closed'` on job ids 1 and 2 when those rows exist, and does nothing when they do not.
    - `supabase/migrations/20261113210000_resumes_bucket.sql` creates the private `resumes` bucket and the upload-only storage policy.
+   - `supabase/migrations/20261115030000_tips.sql` creates the `tips` table, its slug trigger and the read-only row level security policy.
+   - `supabase/migrations/20261115030100_tips_seed.sql` adds the 31 career tips posted on the Facebook Page. It skips any slug that already exists, so it is safe to run again.
 3. In Project Settings → API, copy the project URL and the anon public key.
 4. In Vercel → Project → Settings → Environment Variables, add the names below. Do not commit the values.
 
@@ -76,3 +78,20 @@ Applicants can upload a PDF, DOC, or DOCX up to 5 MB. The file goes into the pri
 Visitors can upload into the bucket. They cannot read, list, update, or delete files. No page links to a CV.
 
 To open one, server code calls `createResumeSignedUrl` in `src/lib/resume-access.ts`. That uses `SUPABASE_SERVICE_ROLE_KEY` on the server and returns a link that expires after 60 seconds. Do not send the service-role key to the browser.
+
+## Career tips
+
+`/tips` lists every published tip grouped by category, `/tips/[slug]` shows one tip, and `/resources` shows the six newest under "Latest tips". All three read the Supabase `tips` table and refresh at least every hour. There is no tip text in the app code; the seed lives only in `supabase/migrations/20261115030100_tips_seed.sql`.
+
+Visitors can read a row only when `status = 'published'`. They cannot insert, update or delete tips.
+
+| Column | Meaning |
+| --- | --- |
+| `slug` | Public URL, for example `/tips/ace-the-phone-screening-call`. Filled from the title when left blank |
+| `title`, `body` | The tip. `body` is plain text: blank lines split paragraphs, `1.` lines become a numbered list, `- ` lines a bullet list, a short line ending in `:` a subheading, and a line starting `Bonus:` a highlighted callout |
+| `category` | Groups tips on `/tips`, for example `Interviews` or `Applications` |
+| `status` | `draft` (hidden), `published` (live), `archived` (hidden) |
+| `published_at` | Sort order and date shown. Set automatically when a tip is published without one |
+| `source`, `source_url` | `facebook` and the Facebook post link, or `site` for tips written for the website. Not shown publicly |
+
+To add a tip, insert a row in the Supabase Table Editor with `status = 'draft'`, check it, then set `status` to `published`. To take one down, set `status` to `archived`. Do not delete the row.
