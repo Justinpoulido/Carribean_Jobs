@@ -15,12 +15,16 @@ export function ContactStatus({
   const [state, formAction] = useActionState(action, { ok: false, message: "" });
 
   return (
-    <form action={formAction} className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+    <form action={formAction} className="grid gap-5 rounded-brand-lg border-2 border-ocean/10 bg-white p-7 sm:p-8">
       {children}
       {state.message ? (
         <p
-          className={`rounded-lg px-4 py-3 text-sm font-semibold ${
-            state.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+          role="status"
+          aria-live="polite"
+          className={`rounded-xl px-4 py-3.5 font-semibold ${
+            state.ok
+              ? "bg-turq-soft text-teal-deep"
+              : "bg-coral-soft text-coral"
           }`}
         >
           {state.message}

@@ -217,12 +217,22 @@ export function WaveDivider({
   return (
     <div className={`pointer-events-none relative leading-[0] ${className}`} aria-hidden="true">
       <div className={`w-[200%] animate-wave-slow ${topColor} opacity-50`}>
-        <svg viewBox="0 0 2400 90" fill="currentColor" className="h-[70px] w-full sm:h-[90px]">
+        <svg
+          viewBox="0 0 2400 90"
+          preserveAspectRatio="none"
+          fill="currentColor"
+          className="h-[70px] w-full sm:h-[90px]"
+        >
           <path d="M0 46q150-46 300 0t300 0t300 0t300 0t300 0t300 0t300 0t300 0V90H0z" />
         </svg>
       </div>
       <div className={`absolute inset-0 w-[200%] animate-wave ${topColor}`}>
-        <svg viewBox="0 0 2400 90" fill="currentColor" className="h-[70px] w-full sm:h-[90px]">
+        <svg
+          viewBox="0 0 2400 90"
+          preserveAspectRatio="none"
+          fill="currentColor"
+          className="h-[70px] w-full sm:h-[90px]"
+        >
           <path d="M0 60q150-40 300 0t300 0t300 0t300 0t300 0t300 0t300 0t300 0V90H0z" />
         </svg>
       </div>

@@ -3,6 +3,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JobsEmptyState } from "@/components/JobsEmptyState";
 import { JobsExplorer } from "@/components/JobsExplorer";
+import { PageHero } from "@/components/PageHero";
+import { Motion } from "@/components/Motion";
 import { getListedJobs } from "@/lib/load-public-jobs";
 
 export const revalidate = 0;
@@ -31,21 +33,13 @@ export default async function JobsPage({
   return (
     <>
       <Header />
-      <main className="bg-slate-50">
-        <section className="border-b border-slate-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <p className="text-sm font-bold uppercase tracking-wide text-[#0077b6]">
-              Caribbean job search
-            </p>
-            <h1 className="mt-3 text-4xl font-black text-slate-950">Jobs board</h1>
-            <p className="mt-4 max-w-2xl leading-7 text-slate-600">
-              Approved vacancies only. Filter by keyword, country, category,
-              company, salary, or work mode. Each listing links to the
-              employer&apos;s application page or email.
-            </p>
-          </div>
-        </section>
-        <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <main id="main">
+        <PageHero
+          kicker="Caribbean job search"
+          title="The jobs board"
+          lead="Approved vacancies only. Filter by keyword, country, category, company, salary, or work mode — every listing links straight to the employer's application page or email."
+        />
+        <section className="mx-auto max-w-7xl px-4 pb-20 pt-12 sm:px-6 lg:px-8">
           {jobs.length === 0 ? (
             <JobsEmptyState />
           ) : (
@@ -54,6 +48,7 @@ export default async function JobsPage({
         </section>
       </main>
       <Footer />
+      <Motion />
     </>
   );
 }
